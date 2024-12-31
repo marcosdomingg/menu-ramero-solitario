@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Menú Shibuya 2024</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      #pdfViewer {
+        width: 100%;
+        height: 100%;
+        max-width: 1080px;
+        max-height: 1920px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      @media (max-width: 768px) {
+        body {
+          padding: 0 10px;
+        }
+
+        #pdfViewer {
+          width: 100%;
+          height: 100%;
+          margin-top: 20px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        #pdfViewer {
+          width: 100%;
+          height: 100%;
+          margin-top: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="pdfViewer"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+
+    <script>
+      var url = "./public/Menu_Ramero_Solitario.pdf";
+
+      var loadingTask = pdfjsLib.getDocument(url);
+      loadingTask.promise
+        .then(function (pdf) {
+          var totalPages = pdf.numPages;
+
+          function renderPage(pageNum) {
+            pdf.getPage(pageNum).then(function (page) {
+              var viewport = page.getViewport({ scale: 1 });
+              var scale =
+                (window.innerWidth / viewport.width) * window.devicePixelRatio;
+              var scaledViewport = page.getViewport({ scale: scale });
+
+              var canvas = document.createElement("canvas");
+              var context = canvas.getContext("2d");
+              canvas.width = scaledViewport.width;
+              canvas.height = scaledViewport.height;
+
+              page.render({
+                canvasContext: context,
+                viewport: scaledViewport,
+              });
+
+              document.getElementById("pdfViewer").appendChild(canvas);
+            });
+          }
+
+          for (var pageNum = 1; pageNum <= totalPages; pageNum++) {
+            renderPage(pageNum);
+          }
+        })
+        .catch(function (error) {
+          console.error("Error al cargar el PDF: ", error);
+        });
+    </script>
+  </body>
+</html>
